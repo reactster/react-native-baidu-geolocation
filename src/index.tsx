@@ -1,68 +1,31 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 import NativeBaiduGeolocation from './NativeBaiduGeolocation';
-import { NativeEventEmitter, type EmitterSubscription } from 'react-native';
-import { Platform, PermissionsAndroid, type Permission } from 'react-native';
+import {
+  NativeEventEmitter,
+  Platform,
+  PermissionsAndroid,
+  type Permission,
+} from 'react-native';
 
 class BaiduGeolocation {
-  static defaultCoorType: 'gcj02' | 'bd09ll' = 'gcj02';
+  static defaultCoorType: 'gcj02' | 'bd09ll' = 'bd09ll';
+
+  private eventEmitter;
 
   constructor(coorType = BaiduGeolocation.defaultCoorType) {
-    this.coorType =
-      coorType.toLowerCase() as typeof BaiduGeolocation.defaultCoorType;
-
     this.eventEmitter = new NativeEventEmitter(NativeBaiduGeolocation as never);
+
+    NativeBaiduGeolocation.setCoorType(coorType);
   }
 
-  listener: EmitterSubscription | undefined;
-  eventEmitter;
-  handler = console.log;
-  coorType = BaiduGeolocation.defaultCoorType;
+  subscribe(listener: (...args: any[]) => void) {
+    this.eventEmitter.addListener('onUpdate', listener);
+  }
 
-  getCurrentPosition = () =>
-    new Promise((resolve, reject) => {
-      try {
-        NativeBaiduGeolocation.getCurrentPosition(this.coorType);
-      } catch (error) {
-        reject(error);
-      }
-
-      this.listener = this.eventEmitter?.addListener(
-        'onGetCurrentLocationPosition',
-        (response) => {
-          if (response.errcode) {
-            reject(response);
-            return;
-          }
-
-          resolve(response);
-        }
-      );
-    });
-
-  start = (listener = console.log) => {
-    NativeBaiduGeolocation.startLocating(this.coorType);
-
-    this.handler = listener;
-    if (!this.listener) {
-      this.listener = this.eventEmitter?.addListener(
-        'onLocationUpdate',
-        (res) => {
-          this.handler(res);
-        }
-      );
-    }
-  };
-
-  stop = () => {
-    NativeBaiduGeolocation.stopLocating();
-
-    if (this.listener) {
-      this.listener.remove();
-      this.listener = undefined;
-      this.handler = console.log;
-    }
-  };
+  unsubscribe() {
+    this.eventEmitter.removeAllListeners('onUpdate');
+  }
 }
 
 export const useBaiduLocation = (
@@ -70,11 +33,10 @@ export const useBaiduLocation = (
   deps = []
 ) => {
   const geo = React.useRef(new BaiduGeolocation(coorType));
-  const [coords, setCoords] = React.useState({ latitude: 0, longitude: 0 });
-  const [finalCoords, setFinalCoords] = React.useState<{
-    latitude?: number;
-    longitude?: number;
-  }>({});
+  const [coords, setCoords] = React.useState({
+    latitude: NaN,
+    longitude: NaN,
+  });
 
   React.useEffect(() => {
     (async function () {
@@ -88,31 +50,18 @@ export const useBaiduLocation = (
         );
       }
 
-      geo.current.start(({ latitude, longitude }) => {
-        setCoords((prev) => {
-          if (prev.latitude !== latitude || prev.longitude !== longitude)
-            return { latitude, longitude };
-          return prev;
+      geo.current.subscribe(({ latitude, longitude }) => {
+        setCoords({
+          latitude: latitude === Number.MIN_VALUE ? NaN : latitude,
+          longitude: longitude === Number.MIN_VALUE ? NaN : longitude,
         });
       });
 
       return () => {
-        geo.current.stop();
+        geo.current.unsubscribe();
       };
     })();
-  }, [...deps]);
+  }, deps);
 
-  React.useEffect(() => {
-    setFinalCoords((prev) => {
-      if (
-        prev.latitude !== coords.latitude ||
-        prev.longitude !== coords.longitude
-      )
-        return coords;
-
-      return prev;
-    });
-  }, [coords]);
-
-  return { coords: finalCoords };
+  return coords;
 };

@@ -4,12 +4,12 @@ import { StyleSheet, View, Text } from 'react-native';
 import { useBaiduLocation } from '@reactster/react-native-baidu-geolocation';
 
 export default function App() {
-  const { coords } = useBaiduLocation('bd09ll');
+  const coords = useBaiduLocation();
 
   return (
     <View style={styles.container}>
       <Text>
-        Hello World {coords?.latitude} {coords?.longitude}
+        Hello World {coords.latitude} {coords.longitude}
       </Text>
     </View>
   );

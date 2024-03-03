@@ -14,8 +14,6 @@ import com.baidu.location.LocationClientOption.LocationMode
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContextBaseJavaModule
-import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.WritableArray
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.module.annotations.ReactModule
@@ -28,10 +26,9 @@ class BaiduGeolocationModule(reactContext: ReactApplicationContext) :
   NativeBaiduGeolocationSpec(reactContext), BDLocationListener {
   private val context = reactContext
 
-  private var locationClient: LocationClient? = null
-  private var locating = false
-  private var locateOnce = false
   private var listenerCount = 0
+  private var locationClient: LocationClient? = null
+  private var coorType: String = "bd09ll"
 
   override fun getName(): String {
     return NAME
@@ -45,7 +42,7 @@ class BaiduGeolocationModule(reactContext: ReactApplicationContext) :
     context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java).emit(eventName, params)
   }
 
-  private fun initLocationClient(coorType: String) {
+  private fun initLocationClient() {
     try {
       LocationClient.setAgreePrivacy(true)
 
@@ -69,54 +66,33 @@ class BaiduGeolocationModule(reactContext: ReactApplicationContext) :
         setFirstLocType(LocationClientOption.FirstLocType.SPEED_IN_FIRST_LOC)
       }
 
-      locationClient = LocationClient(context.applicationContext).apply {
-        registerLocationListener(this@BaiduGeolocationModule)
-        setLocOption(option)
+      if (locationClient == null) {
+        locationClient = LocationClient(context.applicationContext).apply {
+          registerLocationListener(this@BaiduGeolocationModule)
+          setLocOption(option)
+        }
       }
     } catch (e: Exception) {
       e.printStackTrace()
     }
   }
 
-  override fun getCurrentPosition(coorType: String) {
-    if (locating) return
-
-    locating = true
-    locateOnce = true
-    if (locationClient == null) {
-      initLocationClient(coorType)
-    }
-
-    Log.i("getCurrentPosition", "getCurrentPosition")
-    locationClient?.start()
-  }
-
-  override fun startLocating(coorType: String) {
-    if (locating) return
-
-    locating = true
-    locateOnce = false
-    initLocationClient(coorType)
-    locationClient?.start()
-  }
-
-  override fun stopLocating() {
-    locating = false
-    locationClient?.stop()
-    locationClient = null
+  override fun setCoorType(type: String) {
+    coorType = type
   }
 
   override fun addListener(eventName: String) {
     listenerCount++
     if (listenerCount == 1) {
-      // Start any background tasks or upstream listeners here
+      initLocationClient()
+      locationClient?.start()
     }
   }
   
   override fun removeListeners(count: Double) {
     listenerCount -= count.toInt()
     if (listenerCount == 0) {
-      // Stop background tasks or upstream listeners here
+      locationClient?.stop()
     }
   }
 
@@ -141,15 +117,6 @@ class BaiduGeolocationModule(reactContext: ReactApplicationContext) :
       putString("buildingName", bdLocation.buildingName)
     }
 
-    Log.i("onReceiveLocation", "onGetCurrentLocationPosition")
-
-    if (locateOnce) {
-      locating = false
-      sendEvent("onGetCurrentLocationPosition", params)
-      locationClient?.stop()
-      locationClient = null
-    } else {
-      sendEvent("onLocationUpdate", params)
-    }
+    sendEvent("onUpdate", params)
   }
 }

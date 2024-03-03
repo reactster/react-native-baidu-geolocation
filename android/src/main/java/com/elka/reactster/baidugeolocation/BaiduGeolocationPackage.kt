@@ -24,7 +24,7 @@ class BaiduGeolocationPackage : TurboReactPackage() {
         BaiduGeolocationModule.NAME,
         false,  // canOverrideExistingModule
         true,  // needsEagerInit
-        true,  // hasConstants
+        false,  // hasConstants
         true,  // isCxxModule
         true // isTurboModule
       )
