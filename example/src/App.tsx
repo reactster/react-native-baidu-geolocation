@@ -1,10 +1,10 @@
 import * as React from 'react';
 
 import { StyleSheet, View, Text } from 'react-native';
-import { useBaiduLocation } from 'react-native-baidu-geolocation';
+import { useBaiduLocation } from '@reactster/react-native-baidu-geolocation';
 
 export default function App() {
-  const { coords } = useBaiduLocation('gcj02');
+  const { coords } = useBaiduLocation('bd09ll');
 
   return (
     <View style={styles.container}>

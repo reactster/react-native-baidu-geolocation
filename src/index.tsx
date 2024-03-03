@@ -2,6 +2,7 @@
 import * as React from 'react';
 import NativeBaiduGeolocation from './NativeBaiduGeolocation';
 import { NativeEventEmitter, type EmitterSubscription } from 'react-native';
+import { Platform, PermissionsAndroid, type Permission } from 'react-native';
 
 class BaiduGeolocation {
   static defaultCoorType: 'gcj02' | 'bd09ll' = 'gcj02';
@@ -76,17 +77,29 @@ export const useBaiduLocation = (
   }>({});
 
   React.useEffect(() => {
-    geo.current.start(({ latitude, longitude }) => {
-      setCoords((prev) => {
-        if (prev.latitude !== latitude || prev.longitude !== longitude)
-          return { latitude, longitude };
-        return prev;
-      });
-    });
+    (async function () {
+      if (Platform.OS === 'android') {
+        await PermissionsAndroid.requestMultiple(
+          [
+            'ACCESS_FINE_LOCATION',
+            'ACCESS_COARSE_LOCATION',
+            'READ_EXTERNAL_STORAGE',
+          ].map((key) => `android.permission.${key}` as Permission)
+        );
+      }
 
-    return () => {
-      geo.current.stop();
-    };
+      geo.current.start(({ latitude, longitude }) => {
+        setCoords((prev) => {
+          if (prev.latitude !== latitude || prev.longitude !== longitude)
+            return { latitude, longitude };
+          return prev;
+        });
+      });
+
+      return () => {
+        geo.current.stop();
+      };
+    })();
   }, [...deps]);
 
   React.useEffect(() => {
