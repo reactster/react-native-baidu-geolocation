@@ -1,4 +1,4 @@
-package com.baidugeolocationexample
+package com.elka.reactster.baidugeolocationexample
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

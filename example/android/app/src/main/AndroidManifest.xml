@@ -9,6 +9,11 @@
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="false"
       android:theme="@style/AppTheme">
+    
+      <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote" />
+
+      <meta-data android:name="com.baidu.lbsapi.API_KEY" android:value="h1EKrDoe3LvD37qCg9mkxeQ9mduxyEm2" />
+
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

@@ -1,14 +1,16 @@
 import * as React from 'react';
 
 import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from 'react-native-baidu-geolocation';
-
-const result = multiply(3, 7);
+import { useBaiduLocation } from 'react-native-baidu-geolocation';
 
 export default function App() {
+  const { coords } = useBaiduLocation('gcj02');
+
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <Text>
+        Hello World {coords?.latitude} {coords?.longitude}
+      </Text>
     </View>
   );
 }
