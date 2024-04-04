@@ -1,6 +1,6 @@
 {
   "name": "@reactster/react-native-baidu-geolocation",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "RN Baidu Geolocation Plugin with Turbo Modules",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
