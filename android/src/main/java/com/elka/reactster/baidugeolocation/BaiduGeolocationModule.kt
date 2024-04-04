@@ -56,12 +56,14 @@ class BaiduGeolocationModule(reactContext: ReactApplicationContext) :
 
       val option = LocationClientOption().apply {
         setScanSpan(1500)
-        setOpenGnss(true)
+        setOpenGps(true)
+        setOpenGnss(false)
         setCoorType(coorType)
         setIsNeedAddress(true)
         setIsNeedAltitude(true)
+        setIgnoreKillProcess(true)
         setNeedDeviceDirect(false)
-        setIsNeedLocationDescribe(true)
+        setIsNeedLocationDescribe(false)
         setLocationMode(LocationMode.Hight_Accuracy)
         setFirstLocType(LocationClientOption.FirstLocType.SPEED_IN_FIRST_LOC)
       }

@@ -14,9 +14,8 @@ class BaiduGeolocation {
   private eventEmitter;
 
   constructor(coorType = BaiduGeolocation.defaultCoorType) {
-    this.eventEmitter = new NativeEventEmitter(NativeBaiduGeolocation as never);
-
     NativeBaiduGeolocation.setCoorType(coorType);
+    this.eventEmitter = new NativeEventEmitter(NativeBaiduGeolocation as never);
   }
 
   subscribe(listener: (...args: any[]) => void) {
@@ -51,6 +50,7 @@ export const useBaiduLocation = (
       }
 
       geo.current.subscribe(({ latitude, longitude }) => {
+        console.log(latitude, longitude);
         setCoords({
           latitude: latitude === Number.MIN_VALUE ? NaN : latitude,
           longitude: longitude === Number.MIN_VALUE ? NaN : longitude,
