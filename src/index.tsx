@@ -28,7 +28,7 @@ class BaiduGeolocation {
 }
 
 export const useBaiduLocation = (
-  coorType: typeof BaiduGeolocation.defaultCoorType = 'bd09ll',
+  coorType: typeof BaiduGeolocation.defaultCoorType = 'gcj02',
   deps = []
 ) => {
   const geo = React.useRef(new BaiduGeolocation(coorType));
@@ -50,7 +50,6 @@ export const useBaiduLocation = (
       }
 
       geo.current.subscribe(({ latitude, longitude }) => {
-        console.log(latitude, longitude);
         setCoords({
           latitude: latitude === Number.MIN_VALUE ? NaN : latitude,
           longitude: longitude === Number.MIN_VALUE ? NaN : longitude,

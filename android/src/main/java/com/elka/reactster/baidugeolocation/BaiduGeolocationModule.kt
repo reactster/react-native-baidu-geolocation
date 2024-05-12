@@ -46,26 +46,17 @@ class BaiduGeolocationModule(reactContext: ReactApplicationContext) :
     try {
       LocationClient.setAgreePrivacy(true)
 
-      context.currentActivity?.let { AppUtils.checkPermission(it, Manifest.permission.READ_LOGS) }
-      context.currentActivity?.let { AppUtils.checkPermission(it, Manifest.permission.FOREGROUND_SERVICE) }
       context.currentActivity?.let { AppUtils.checkPermission(it, Manifest.permission.ACCESS_FINE_LOCATION) }
       context.currentActivity?.let { AppUtils.checkPermission(it, Manifest.permission.ACCESS_COARSE_LOCATION) }
-      context.currentActivity?.let { AppUtils.checkPermission(it, Manifest.permission.READ_EXTERNAL_STORAGE) }
-      context.currentActivity?.let { AppUtils.checkPermission(it, Manifest.permission.WRITE_EXTERNAL_STORAGE) }
-      context.currentActivity?.let { AppUtils.checkPermission(it, Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS) }
 
       val option = LocationClientOption().apply {
         setScanSpan(1500)
         setOpenGps(true)
-        setOpenGnss(false)
         setCoorType(coorType)
         setIsNeedAddress(true)
         setIsNeedAltitude(true)
-        setIgnoreKillProcess(true)
-        setNeedDeviceDirect(false)
         setIsNeedLocationDescribe(false)
         setLocationMode(LocationMode.Hight_Accuracy)
-        setFirstLocType(LocationClientOption.FirstLocType.SPEED_IN_FIRST_LOC)
       }
 
       if (locationClient == null) {
