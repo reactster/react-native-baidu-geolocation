@@ -9,11 +9,16 @@ import {
 } from 'react-native';
 
 class BaiduGeolocation {
+  static defaultScanSpan: number = 3000;
   static defaultCoorType: 'gcj02' | 'bd09ll' = 'bd09ll';
 
   private eventEmitter;
 
-  constructor(coorType = BaiduGeolocation.defaultCoorType) {
+  constructor(
+    coorType = BaiduGeolocation.defaultCoorType,
+    scanSpan = BaiduGeolocation.defaultScanSpan
+  ) {
+    NativeBaiduGeolocation.setScanSpan(scanSpan);
     NativeBaiduGeolocation.setCoorType(coorType);
     this.eventEmitter = new NativeEventEmitter(NativeBaiduGeolocation as never);
   }
@@ -28,10 +33,11 @@ class BaiduGeolocation {
 }
 
 export const useBaiduLocation = (
-  coorType: typeof BaiduGeolocation.defaultCoorType = 'gcj02',
+  coorType = BaiduGeolocation.defaultCoorType,
+  scanSpan = BaiduGeolocation.defaultScanSpan,
   deps = []
 ) => {
-  const geo = React.useRef(new BaiduGeolocation(coorType));
+  const geo = React.useRef(new BaiduGeolocation(coorType, scanSpan));
   const [coords, setCoords] = React.useState({
     latitude: NaN,
     longitude: NaN,

@@ -29,6 +29,7 @@ class BaiduGeolocationModule(reactContext: ReactApplicationContext) :
   private var listenerCount = 0
   private var locationClient: LocationClient? = null
   private var coorType: String = "bd09ll"
+  private var scanSpan: Double = 3000.toDouble()
 
   override fun getName(): String {
     return NAME
@@ -50,9 +51,9 @@ class BaiduGeolocationModule(reactContext: ReactApplicationContext) :
       context.currentActivity?.let { AppUtils.checkPermission(it, Manifest.permission.ACCESS_COARSE_LOCATION) }
 
       val option = LocationClientOption().apply {
-        setScanSpan(1500)
         setOpenGps(true)
         setCoorType(coorType)
+        setScanSpan(scanSpan)
         setIsNeedAddress(true)
         setIsNeedAltitude(true)
         setIsNeedLocationDescribe(false)
@@ -68,6 +69,10 @@ class BaiduGeolocationModule(reactContext: ReactApplicationContext) :
     } catch (e: Exception) {
       e.printStackTrace()
     }
+  }
+
+  override fun setScanSpan(value: Double) {
+    scanSpan = value
   }
 
   override fun setCoorType(type: String) {
